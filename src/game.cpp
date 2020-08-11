@@ -4,14 +4,8 @@
 
 #include "game.h"
 
-void Game::initWindow() {
-    window = new sf::RenderWindow(sf::VideoMode(1024, 720), "Jungle Tower");
-    window->setFramerateLimit(60);
-}
 
-//const sf::RenderWindow & Game::getWindow*() const {
-//    return window;
-//}
+
 
 Game::Game() {
     window = nullptr;
@@ -19,12 +13,10 @@ Game::Game() {
     initWindow();
     initPlayer();
 }
-
 Game::~Game() {
     delete window;
     delete player;
 }
-
 void Game::update() {
     while(window->pollEvent(sfEvent))
     {
@@ -33,7 +25,6 @@ void Game::update() {
     }
     updatePlayer();
 }
-
 void Game::render(){
     window->clear();
 
@@ -42,7 +33,6 @@ void Game::render(){
 
     window->display();
 }
-
 void Game::run() {
     while (window->isOpen())
     {
@@ -50,15 +40,16 @@ void Game::run() {
         render();
     }
 }
-
 void Game::updatePlayer() {
     player->update();
 }
-
 void Game::initPlayer() {
     player = new Player();
 }
-
+void Game::initWindow() {
+    window = new sf::RenderWindow(sf::VideoMode(win_width, win_height), "Jungle Tower");
+    window->setFramerateLimit(60);
+}
 void Game::renderPlayer() {
     player->render(window);
 }

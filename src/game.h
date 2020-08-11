@@ -29,8 +29,8 @@ private:
 public:
 
     //-------------------------------- HELPERS -----------------------------------
-    const float win_width = 1024.f;
-    const float win_height = 720.f;
+    const unsigned int win_width = 1680.f;
+    const unsigned int win_height = 960.f;
 
     //----------------------------- CONSTRUCTION ---------------------------------
     Game();                     // Game constructor - creates the game window in the main.cpp.

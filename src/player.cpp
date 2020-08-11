@@ -2,36 +2,52 @@
 // Created by Pablo on 09.08.2020.
 //
 
+#include <iostream>
 #include "player.h"
 
-
+//================ CONSTRUCTORS ====================
 Player::Player() {
     initTexture();
     initSprite();
-    in_movement = false;
+    initAnimations();
+    gravitySwitch = true;
     state = State::IDLE;
+    position.x = 700.f;
+    position.y = 660.f;
+    in_air = false;
 }
-
 Player::~Player() {
-
+    delete this;
 }
+//==================================================
 
+
+//============== INITIALIZATIONS ===================
 void Player::initTexture() {
-    textureSheet.loadFromFile("PlayerTexture.png");
+    textureSheet.loadFromFile("PlayerTexture.png"); // Load texture sheet from file (whole pattern)
 }
-
 void Player::initSprite() {
-    sprite.setTexture(textureSheet);
+    sprite.setTexture(textureSheet);           // Set te texture sprite sheet for character
     frame = sf::IntRect(0,0,50,48);
-    sprite.setTextureRect(frame);
-    sprite.setScale(2.f,2.f);
+    sprite.setTextureRect(frame);              // Place the sprite pattern rect
+    sprite.setScale(1.5f,1.5f);   // Rescaling the sprite - bigger
+    sprite.setPosition(500,800);
 }
+void Player::initAnimations() {
+    animationTimer.restart();
+}
+void Player::render(sf::RenderTarget* target) {
+    target->draw(sprite);
+}
+//==================================================
 
+
+//================= UPDATING =======================
 void Player::update() {
+    updatePhysics();
     updateMovement();
     updateAnimations();
 }
-
 void Player::updateAnimations()
 {
     if (animationTimer.getElapsedTime().asSeconds() >= 0.13f)
@@ -63,39 +79,94 @@ void Player::updateAnimations()
         sprite.setTextureRect(frame);
     }
 }
-
 void Player::updateMovement() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
-        sprite.move(-5.f,0.f);
+        move(-5.f, 0.f);
         state = State::MOVING_L;
     }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
-        sprite.move(5.f, 0.f);
+        move(5.f, 0.f);
         state = State::MOVING_R;
     }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    //TODO implement fast fall
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-
-        if (state == State::IN_AIR)
-        {
-            state = State::FALLING;
-            sprite.move(0.f, 5.f);
-        }
-
+        velocity.y = 12.f;
     }
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
-        state = State::JUMP;
+        gravitySwitch = false;
+        in_air = true;
+        velocity.y = kJumpAccel;
     }
-    else
+    if (!IsAnyKeyPressed())
         state = State::IDLE;
+    sprite.move(velocity);
+}
+void Player::updatePhysics() {
+//
+//    sf::Vector2f currentpos = sprite.getPosition();
+//    if (currentpos.y > position.y) //!!!!! TEST
+//    {
+//        velocity.y = 0.f;
+//    }
+
+
+    // Accelerating the gravity drag force
+    if (gravitySwitch && sprite.getPosition().y < 750) //TODO remove hardcored positiion
+    {
+        velocity.y += 1.0 * gravity;
+        if (std::abs(velocity.y) > kMaxGravity)
+            velocity.y = kMaxGravity * ((velocity.y < 0.f) ? -1.f : 1.f);
+    }
+
+    if (!gravitySwitch) // TODO Chceck if it works - implement in updateMovement()
+    {
+        if (velocity.y >= kMinGravity && sprite.getPosition().y < 750) //TODO remove hardcored positiion
+        {
+            gravitySwitch = true;
+        }
+        else
+            velocity.y += 1.0 * gravity;
+    }
+
+    // Slowing down the player's character
+    velocity *= kDrag;
+
+    // Limit the slowing process
+    if (std::abs(velocity.x)  < kVelocityMin)
+        velocity.x = 0.f;
+    if (std::abs(velocity.y) < kVelocityMin)
+        velocity.y = 0.f;
+
+    sprite.move(velocity);
+}
+//==================================================
+
+
+//============== CHARACTER EVENTS ==================
+void Player::move(const float dir_x, const float dir_y) {
+
+    // Accelerating the player's character
+    velocity.x += dir_x * kAccel;
+
+    // Limiting the player's velocity
+    if (std::abs(velocity.x) > kVelocityMax)
+    {
+        velocity.x = kVelocityMax * ((velocity.x < 0.f) ? -1.f : 1.f);
+    }
 }
 
-void Player::render(sf::RenderTarget* target) {
-    target->draw(sprite);
+bool Player::IsAnyKeyPressed() {
+    for (int i = -1; i < sf::Keyboard::KeyCount; ++i)
+    {
+        if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(i)))
+            return true;
+    }
+    return false;
 }
+//==================================================
 
-void Player::initAnimations() {
-    animationTimer.restart();
-}
+
+
