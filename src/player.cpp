@@ -10,11 +10,11 @@ Player::Player() {
     initTexture();
     initSprite();
     initAnimations();
-    gravitySwitch = true;
     state = State::IDLE;
     position.x = 700.f;
     position.y = 660.f;
-    in_air = false;
+    jumping = false;
+    isOnPlatform = false;
 }
 Player::~Player() {
     delete this;
@@ -27,10 +27,10 @@ void Player::initTexture() {
     textureSheet.loadFromFile("PlayerTexture.png"); // Load texture sheet from file (whole pattern)
 }
 void Player::initSprite() {
-    sprite.setTexture(textureSheet);           // Set te texture sprite sheet for character
+    sprite.setTexture(textureSheet);                        // Set te texture sprite sheet for character
     frame = sf::IntRect(0,0,50,48);
-    sprite.setTextureRect(frame);              // Place the sprite pattern rect
-    sprite.setScale(1.5f,1.5f);   // Rescaling the sprite - bigger
+    sprite.setTextureRect(frame);                           // Place the sprite pattern rect
+    sprite.setScale(1.5f,1.5f);              // Rescaling the sprite - bigger
     sprite.setPosition(500,800);
 }
 void Player::initAnimations() {
@@ -92,44 +92,39 @@ void Player::updateMovement() {
     //TODO implement fast fall
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        velocity.y = 12.f;
+        move(0.f, 5.f);
+        //velocity.y = kDownDragAccel;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
-        gravitySwitch = false;
-        in_air = true;
+        //gravitySwitch = false;
+        isOnPlatform = false;
         velocity.y = kJumpAccel;
     }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        move(0.f, -5.f);
+
     if (!IsAnyKeyPressed())
         state = State::IDLE;
     sprite.move(velocity);
 }
 void Player::updatePhysics() {
-//
-//    sf::Vector2f currentpos = sprite.getPosition();
-//    if (currentpos.y > position.y) //!!!!! TEST
-//    {
-//        velocity.y = 0.f;
-//    }
 
-
-    // Accelerating the gravity drag force
-    if (gravitySwitch && sprite.getPosition().y < 750) //TODO remove hardcored positiion
+//    // Accelerating the gravity drag force
+    if (!isOnPlatform) //TODO remove hardcored positiion
     {
         velocity.y += 1.0 * gravity;
         if (std::abs(velocity.y) > kMaxGravity)
             velocity.y = kMaxGravity * ((velocity.y < 0.f) ? -1.f : 1.f);
     }
 
-    if (!gravitySwitch) // TODO Chceck if it works - implement in updateMovement()
-    {
-        if (velocity.y >= kMinGravity && sprite.getPosition().y < 750) //TODO remove hardcored positiion
-        {
-            gravitySwitch = true;
-        }
-        else
-            velocity.y += 1.0 * gravity;
-    }
+//    if (jumping) // TODO Chceck if it works - implement in updateMovement()
+//    {
+//        if (velocity.y >= kMinGravity) //TODO remove hardcored positiion
+//        {
+//            jumping = false;
+//        }
+//    }
 
     // Slowing down the player's character
     velocity *= kDrag;
@@ -150,14 +145,18 @@ void Player::move(const float dir_x, const float dir_y) {
 
     // Accelerating the player's character
     velocity.x += dir_x * kAccel;
+    //velocity.y += dir_y * kAccel;
 
     // Limiting the player's velocity
     if (std::abs(velocity.x) > kVelocityMax)
     {
         velocity.x = kVelocityMax * ((velocity.x < 0.f) ? -1.f : 1.f);
     }
+    //if (std::abs(velocity.y) > kVelocityMax)
+    //{
+       // velocity.y = kVelocityMax * ((velocity.y < 0.f) ? -1.f : 1.f);
+   // }
 }
-
 bool Player::IsAnyKeyPressed() {
     for (int i = -1; i < sf::Keyboard::KeyCount; ++i)
     {
@@ -166,6 +165,31 @@ bool Player::IsAnyKeyPressed() {
     }
     return false;
 }
+void Player::resetVelocity() {
+    velocity.y = 0.f;
+}
+void Player::setPlayerPosition(const float x, const float y) {
+    sprite.setPosition(x,y);
+}
+const sf::FloatRect Player::getGlobalBounds() const {
+    return sprite.getGlobalBounds();
+}
+
+
+sf::Vector2f Player::getVelocity() {
+    return velocity;
+}
+
+void Player::setVelocity(float x, float y) {
+    velocity.x = x;
+    velocity.y = y;
+}
+
+
+void Player::setIsOnPlatform(bool x) {
+    Player::isOnPlatform = x;
+}
+
 //==================================================
 
 
