@@ -12,9 +12,8 @@ Game::Game() {
     window = nullptr;
     dt = 0;
     Platforms = new std::vector<Platform*>;
-    generatePlatform(200, 800, 1);
-    generatePlatform(1300, 200,4);
-    generatePlatform(700,600, 5);
+    generateGround();
+    platformRNG();
     initWindow();
     initBg();
     initPlayer();
@@ -45,8 +44,8 @@ void Game::update() {
             window->close();
     }
     updatePlayer();
-    updateAccessors();
     updateCollision();
+    platformRNG();
 }
 void Game::render(){
     window->clear();
@@ -90,6 +89,18 @@ void Game::updateCollision() {
         player->setPlayerPosition(player->getGlobalBounds().left,
                                   window->getSize().y - player->getGlobalBounds().height);
     }
+
+    if (player->getGlobalBounds().left < 0)
+    {
+        player->setVelocity(0.f, player->getVelocity().y);
+        player->setPlayerPosition(0, player->getGlobalBounds().top);
+    }
+
+    if (player->getGlobalBounds().left + player->getGlobalBounds().width > window->getSize().x)
+    {
+        player->setVelocity(0.f, player->getVelocity().y);
+        player->setPlayerPosition(window->getSize().x - player->getGlobalBounds().width, player->getGlobalBounds().top);
+    }
     if (!Platforms->empty()) {
 
 
@@ -98,15 +109,16 @@ void Game::updateCollision() {
             sf::FloatRect platformBounds = Platform->getGlobalBounds();
             sf::FloatRect playerBounds = player->getGlobalBounds();
 
-            if ((playerBounds.top+playerBounds.height > platformBounds.top) &&
-                    (playerBounds.top+playerBounds.height < platformBounds.top+platformBounds.height) &&
-                    (playerBounds.left + playerBounds.width > platformBounds.left) &&
-                    (playerBounds.left < platformBounds.left+platformBounds.width))
+            // ((playerBounds.left ))
+
+            if ((playerBounds.top+playerBounds.height >= platformBounds.top) &&
+                    (playerBounds.top+playerBounds.height <= platformBounds.top+(0.5*platformBounds.height)) &&
+                    (playerBounds.left + playerBounds.width >= platformBounds.left) &&
+                    (playerBounds.left <= platformBounds.left+platformBounds.width))
             {
-                std::cout << "COLLISION from UP\n";
                 player->setIsOnPlatform(true);
                 player->setVelocity(player->getVelocity().x, 0.f);
-                player->setPlayerPosition(playerBounds.left, platformBounds.top - playerBounds.height );
+                player->setPlayerPosition(playerBounds.left, platformBounds.top - playerBounds.height+10);
 
             }
             else
@@ -121,11 +133,55 @@ void Game::generatePlatform(float x, float y, int patt) {
     Platforms->push_back(new_platform);
 }
 
-void Game::updateAccessors() {
-    playerTop = player->getGlobalBounds().top;
-    playerLeft = player->getGlobalBounds().left;
-    playerH = player->getGlobalBounds().height;
-    playerW = player->getGlobalBounds().width;
+
+void Game::generateGround() {
+    ground = new Platform();
+    Platforms->push_back(ground);
+}
+
+void Game::platformRNG() {
+
+    // Definition of boundaries within which i want to generate platforms
+    float width_start = 0.f;
+    float width_stop = 1300.f;
+    float height_start = 150.f;
+    float height_stop = 750.f;
+
+    // Initialization of random device
+    std::random_device rd;
+    std::mt19937  mt(rd());
+    std::uniform_real_distribution<float> w_dist(width_start, width_stop);
+    //std::uniform_real_distribution<float> h_dist(height_start, height_stop);
+    std::uniform_real_distribution<float> splitter_dist(80.f, 150.f);
+
+    // Screen segmentation
+    int splitter = 0;
+
+    if (Platforms->size() <= 7 && splitter <= height_stop)
+    {
+        while (Platforms->size() <= 7)
+        {
+            splitter += splitter_dist(mt);
+            generatePlatform(w_dist(mt), static_cast<float>(splitter), 1);
+        }
+    }
+
+}
+
+void Game::updatePlatforms() {
+    Platform* temp = nullptr;
+    for (int i = 0; i < Platforms->size(); ++i)
+    {
+        sf::FloatRect platformBounds = Platforms->at(i)->getGlobalBounds();
+        if (platformBounds.top > window->getSize().y)
+        {
+            temp = Platforms->at(i);
+            Platforms->erase(Platforms->begin()+(i-1));
+            delete temp;
+            temp = nullptr;
+        }
+    }
+
 }
 
 

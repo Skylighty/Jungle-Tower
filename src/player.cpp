@@ -174,18 +174,13 @@ void Player::setPlayerPosition(const float x, const float y) {
 const sf::FloatRect Player::getGlobalBounds() const {
     return sprite.getGlobalBounds();
 }
-
-
 sf::Vector2f Player::getVelocity() {
     return velocity;
 }
-
 void Player::setVelocity(float x, float y) {
     velocity.x = x;
     velocity.y = y;
 }
-
-
 void Player::setIsOnPlatform(bool x) {
     Player::isOnPlatform = x;
 }
