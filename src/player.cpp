@@ -6,8 +6,7 @@
 #include "player.h"
 
 //================ CONSTRUCTORS ====================
-Player::Player(Game *game) {
-    game_ = game;
+Player::Player() {
     initTexture();
     initSprite();
     initAnimations();
@@ -16,6 +15,7 @@ Player::Player(Game *game) {
     position.y = 660.f;
     isOnPlatform = false;
     jumpcount = 0;
+    dead = false;
 }
 Player::~Player() {
     //delete this;
@@ -121,6 +121,7 @@ void Player::updatePhysics() {
             velocity.y = kMaxGravity * ((velocity.y < 0.f) ? -1.f : 1.f);
     }
 
+
 //    if (jumping) // TODO Chceck if it works - implement in updateMovement()
 //    {
 //        if (velocity.y >= kMinGravity) //TODO remove hardcored positiion
@@ -168,9 +169,6 @@ bool Player::IsAnyKeyPressed() {
     }
     return false;
 }
-void Player::resetVelocity() {
-    velocity.y = 0.f;
-}
 void Player::setPlayerPosition(const float x, const float y) {
     sprite.setPosition(x,y);
 }
@@ -190,17 +188,15 @@ void Player::setIsOnPlatform(bool x) {
 void Player::resetJump() {
     jumpcount = 0;
 }
-
 void Player::Jump() {
 
     if (jumpcount < 2)
     {
         jumpcount++;
         isOnPlatform = false;
-        velocity.y += kJumpAccel;
+        velocity.y = kJumpAccel;
     }
 }
-
 //==================================================
 
 

@@ -15,6 +15,17 @@
 class Game {
 
 public:
+
+    // Enum class for changing textures of platforms
+    enum class Level{
+        GRASS,
+        GROUND,
+        STONE,
+        SNOW,
+        ICE
+    };
+
+
     //----------------------------- CONSTRUCTION ---------------------------------
     Game();                     // Game constructor - creates the game window in the main.cpp.
     ~Game();                    // Game de-constructor
@@ -28,25 +39,23 @@ public:
 private:
     //-------------------------------ATTRIBUTES----------------------------------
     sf::RenderWindow* window;       // Main window object of the game class.
+    Level level;                    // Platform level that player currently is on
     Player* player;                 // Player object in the game
     Platform* ground;               // Ground platform object for start of the game
     sf::Texture bg_texture;         // Texture for background
     sf::Sprite bg_sprite;           // Sprite for background
+    sf::Font font;                  // Font for the whole game
+    sf::Text Score;                 // Score for the game in text SFML format
     sf::IntRect bg_rect;            // Rectangle object for background to render it
     sf::Event sfEvent;              // Event object that we overwrite each time
     sf::Clock dtClock;              // Delta time clock
+    bool started;                   // Flag determining whether the game has begun
     int score;                      // Player's current score
+    int patternNumber;              // Pattern number for different platforms
     float dt;                       // Current delta time
+    float platformsVelocity;        // Global velocity for all platforms
     //sf::SoundBuffer sbuffer;      // Sound buffer for game window
     //sf::Sound sound;              // Sound for game window
-    void initWindow();              // Method initializing the window.
-    void initPlayer();              // Initializes the player object
-    void initBg();                  // Initializes game background image/images
-    void generatePlatform(float x, float y, int pattern);       // Generates a new platform at specified place
-    void generateGround();                                      // Generates basic ground for start of the game
-    void platformRNG();                                         // Random generating of platforms
-    void setEvent(sf::Event::EventType type);                   //  Sets the event type
-    //TODO unsigned int score;                                  // Player's score (hopped platforms)
     std::vector<Platform*>* Platforms;                          // Vector to contain platforms on the screen
 
     //------------------------------- METHODS ------------------------------------
@@ -58,14 +67,19 @@ private:
     void updateDT();                // Updates the delta time
     void renderPlayer();            // Renders the player's character during initialization phase
     void renderBg();                // Renders the background during initialization phase
+    void renderScore();             // Renders the player's score
+    void initScore();               // Initializes the palyer's score
     void renderPlatforms();         // Responsible for rendering platform objects
     void render();                  // Renders the game as whole - !GENERAL METHOD
+    void checkDeath();              // Checks if player is dead
+    void updateBg();                // Moves the background slowly
+    void initWindow();              // Method initializing the window.
+    void initPlayer();              // Initializes the player object
+    void initBg();                  // Initializes game background image/images
+    void generatePlatform(float x, float y);                    // Generates a new platform at specified place
+    void generateGround();                                      // Generates basic ground for start of the game
+    void platformRNG();                                         // Random generating of platforms
 
-    //-------------------------------- RNG ----------------------------------------
-    std::random_device rd;
-    std::mt19937 mt;
-    float width_start = 100.f;
-    float width_stop = 1200.f;
 
 };
 

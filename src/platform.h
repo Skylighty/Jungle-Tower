@@ -17,20 +17,16 @@ public:
         SNOW,
         ICE
     };
-    Platform(const float x, const float y, int patt);
+    Platform(const float x, const float y, int patt, float globalVelo);
     Platform();
     ~Platform();
     void render(sf::RenderTarget* target);                  // Rendering the platforms
     void patternSwitch(int x);                              // Pattern switcher
-    void movePlatform();                                    // Move accesor for platforms
-    sf::Vector2f getVelocity();                             // Getter for platform velocity
-    void setVelocity(const int x, const int y);             // Setter for platform velocity
+    void movePlatform();                                    // Move accessor for platforms
+    void setVelocity(const float x);                        // Setter for platforms global velocity
     const sf::FloatRect getGlobalBounds() const;            // Returns the bounds of platform sprite rectangle
     bool ground;                                            // Checks if the platform is the floor
-
-private:
-
-public:
+    bool visited;                                           // Flags if the player scored the platform
 
 
 private:
