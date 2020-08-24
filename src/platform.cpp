@@ -8,7 +8,10 @@ Platform::Platform(const float x, const float y, int patt) {
     patternSwitch(patt);
     initTexture();
     initSprite();
+    velocity.x = 0.f;
+    velocity.y = 2.5f;
     sprite.setPosition(x,y);
+    ground = false;
 }
 
 Platform::Platform()
@@ -18,10 +21,11 @@ Platform::Platform()
     sf::IntRect frame = sf::IntRect(0,0,1680,61);
     sprite.setTextureRect(frame);
     sprite.setPosition(0.f, 960.f-61.f);
+    ground = true;
 }
 
 Platform::~Platform() {
-    delete this;
+
 }
 
 void Platform::render(sf::RenderTarget *target) {
@@ -66,6 +70,18 @@ const sf::FloatRect Platform::getGlobalBounds() const{
     return sprite.getGlobalBounds();
 }
 
+sf::Vector2f Platform::getVelocity() {
+    return velocity;
+}
+
+void Platform::setVelocity(const int x, const int y) {
+    velocity.x = x;
+    velocity.y = y;
+}
+
+void Platform::movePlatform() {
+    sprite.move(velocity);
+}
 
 
 

@@ -17,6 +17,7 @@ Game::Game() {
     initWindow();
     initBg();
     initPlayer();
+    mt = std::mt19937();
 }
 Game::~Game() {
     delete window;
@@ -35,17 +36,21 @@ void Game::updatePlayer() {
     player->update();
 }
 void Game::initPlayer() {
-    player = new Player();
+    player = new Player(this);
 }
 void Game::update() {
     while(window->pollEvent(sfEvent))
     {
         if (sfEvent.type == sf::Event::Closed || (sfEvent.type == sf::Event::KeyPressed && sfEvent.key.code == sf::Keyboard::Escape))
             window->close();
+        if ((sfEvent.type == sf::Event::KeyPressed) && (sfEvent.key.code == sf::Keyboard::Space))
+            player->Jump();
     }
+    updateDT();
     updatePlayer();
+    updateScore();
     updateCollision();
-    platformRNG();
+    updatePlatforms();
 }
 void Game::render(){
     window->clear();
@@ -84,11 +89,11 @@ void Game::renderBg() {
     window->draw(bg_sprite);
 }
 void Game::updateCollision() {
-    if (player->getGlobalBounds().top + player->getGlobalBounds().height > window->getSize().y) {
-        player->resetVelocity();
-        player->setPlayerPosition(player->getGlobalBounds().left,
-                                  window->getSize().y - player->getGlobalBounds().height);
-    }
+//    // Bottom
+//    if (player->getGlobalBounds().top + player->getGlobalBounds().height > window->getSize().y) {
+//        player->resetVelocity();
+//        player->setPlayerPosition(player->getGlobalBounds().left,window->getSize().y - player->getGlobalBounds().height);
+//    }
 
     if (player->getGlobalBounds().left < 0)
     {
@@ -116,6 +121,7 @@ void Game::updateCollision() {
                     (playerBounds.left + playerBounds.width >= platformBounds.left) &&
                     (playerBounds.left <= platformBounds.left+platformBounds.width))
             {
+                player->resetJump();
                 player->setIsOnPlatform(true);
                 player->setVelocity(player->getVelocity().x, 0.f);
                 player->setPlayerPosition(playerBounds.left, platformBounds.top - playerBounds.height+10);
@@ -126,62 +132,77 @@ void Game::updateCollision() {
         }
     }
 }
-
-
 void Game::generatePlatform(float x, float y, int patt) {
     auto* new_platform = new Platform(x,y, patt);
     Platforms->push_back(new_platform);
 }
-
-
 void Game::generateGround() {
     ground = new Platform();
     Platforms->push_back(ground);
 }
-
 void Game::platformRNG() {
 
-    // Definition of boundaries within which i want to generate platforms
-    float width_start = 0.f;
-    float width_stop = 1300.f;
-    float height_start = 150.f;
-    float height_stop = 750.f;
-
-    // Initialization of random device
-    std::random_device rd;
-    std::mt19937  mt(rd());
-    std::uniform_real_distribution<float> w_dist(width_start, width_stop);
-    //std::uniform_real_distribution<float> h_dist(height_start, height_stop);
-    std::uniform_real_distribution<float> splitter_dist(80.f, 150.f);
 
     // Screen segmentation
     int splitter = 0;
+    int dt_conv = static_cast<int>(dt);
 
-    if (Platforms->size() <= 7 && splitter <= height_stop)
+    std::uniform_real_distribution<float> w_dist(width_start, width_stop);
+    std::uniform_real_distribution<float> splitter_dist(100.f, 200.f);
+
+    if (Platforms->size() <= 6 && splitter <= 750.f)
     {
-        while (Platforms->size() <= 7)
+        //while (Platforms->size() <= 7)
+        //{
+        while (Platforms->size() < 6)
         {
             splitter += splitter_dist(mt);
             generatePlatform(w_dist(mt), static_cast<float>(splitter), 1);
         }
+        //}
     }
 
 }
-
 void Game::updatePlatforms() {
     Platform* temp = nullptr;
+    for (auto &Platform : *Platforms)
+    {
+        Platform->movePlatform();
+    }
     for (int i = 0; i < Platforms->size(); ++i)
     {
         sf::FloatRect platformBounds = Platforms->at(i)->getGlobalBounds();
-        if (platformBounds.top > window->getSize().y)
+        if ((platformBounds.top + platformBounds.height > window->getSize().y - ground->getGlobalBounds().height) &&
+        !Platforms->at(i)->ground)
         {
             temp = Platforms->at(i);
-            Platforms->erase(Platforms->begin()+(i-1));
+            Platforms->erase(Platforms->begin()+(i));
             delete temp;
             temp = nullptr;
+            platformRNG();
         }
     }
-
 }
+void Game::updateDT() {
+    dt = dtClock.getElapsedTime().asSeconds();
+}
+
+void Game::updateScore() {
+    auto playerBounds = player->getGlobalBounds();
+    for (auto &Platform: *Platforms)
+    {
+        auto platformBounds = Platform->getGlobalBounds();
+        if (playerBounds.top + playerBounds.height < platformBounds.top)
+            score++;
+    }
+}
+
+void Game::setEvent(sf::Event::EventType type) {
+    sfEvent.type = type;
+}
+
+
+
+
 
 

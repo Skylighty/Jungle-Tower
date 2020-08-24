@@ -6,18 +6,19 @@
 #include "player.h"
 
 //================ CONSTRUCTORS ====================
-Player::Player() {
+Player::Player(Game *game) {
+    game_ = game;
     initTexture();
     initSprite();
     initAnimations();
     state = State::IDLE;
     position.x = 700.f;
     position.y = 660.f;
-    jumping = false;
     isOnPlatform = false;
+    jumpcount = 0;
 }
 Player::~Player() {
-    delete this;
+    //delete this;
 }
 //==================================================
 
@@ -95,12 +96,14 @@ void Player::updateMovement() {
         move(0.f, 5.f);
         //velocity.y = kDownDragAccel;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-    {
-        //gravitySwitch = false;
-        isOnPlatform = false;
-        velocity.y = kJumpAccel;
-    }
+
+    //TODO - We have to implement this triggering on event, because the key is constantly being chekcked
+//    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && (jumpcount < 3))
+//    {
+//            jumpcount++;
+//            isOnPlatform = false;
+//            velocity.y = kJumpAccel;
+//    }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         move(0.f, -5.f);
 
@@ -183,6 +186,19 @@ void Player::setVelocity(float x, float y) {
 }
 void Player::setIsOnPlatform(bool x) {
     Player::isOnPlatform = x;
+}
+void Player::resetJump() {
+    jumpcount = 0;
+}
+
+void Player::Jump() {
+
+    if (jumpcount < 2)
+    {
+        jumpcount++;
+        isOnPlatform = false;
+        velocity.y += kJumpAccel;
+    }
 }
 
 //==================================================
