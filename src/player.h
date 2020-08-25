@@ -5,6 +5,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 #include <vector>
+#include <cstdlib>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 

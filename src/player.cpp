@@ -117,7 +117,7 @@ void Player::updatePhysics() {
     if (!isOnPlatform) //TODO remove hardcored positiion
     {
         velocity.y += 1.0 * gravity;
-        if (std::abs(velocity.y) > kMaxGravity)
+        if (std::abs(static_cast<int>(velocity.y)) > kMaxGravity)
             velocity.y = kMaxGravity * ((velocity.y < 0.f) ? -1.f : 1.f);
     }
 
@@ -134,9 +134,9 @@ void Player::updatePhysics() {
     velocity *= kDrag;
 
     // Limit the slowing process
-    if (std::abs(velocity.x)  < kVelocityMin)
+    if (std::abs(static_cast<int>(velocity.x))  < kVelocityMin)
         velocity.x = 0.f;
-    if (std::abs(velocity.y) < kVelocityMin)
+    if (std::abs(static_cast<int>(velocity.y)) < kVelocityMin)
         velocity.y = 0.f;
 
     sprite.move(velocity);
@@ -152,7 +152,7 @@ void Player::move(const float dir_x, const float dir_y) {
     //velocity.y += dir_y * kAccel;
 
     // Limiting the player's velocity
-    if (std::abs(velocity.x) > kVelocityMax)
+    if (std::abs(static_cast<int>(velocity.x)) > kVelocityMax)
     {
         velocity.x = kVelocityMax * ((velocity.x < 0.f) ? -1.f : 1.f);
     }
