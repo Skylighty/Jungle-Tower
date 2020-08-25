@@ -25,6 +25,7 @@ Game::Game() {
     generateGround();
     platformRNG();
     initPlayer();
+    initMusic();
     initScore();
 }                 //|
 Game::~Game() {
@@ -97,6 +98,12 @@ void Game::initBg() {
     bg_sprite.setTexture(bg_texture);
     bg_rect = sf::IntRect(0,0,1688,961);
     bg_sprite.setTextureRect(bg_rect);
+}
+void Game::initMusic() {
+    music.openFromFile("music.ogg");
+    music.setVolume(5.f);
+    music.setLoop(true);
+    music.play();
 }
 void Game::initPlayer() {
     player = new Player();
@@ -259,28 +266,28 @@ void Game::updateScore() {
     {
         patternNumber = 2;
         if (level == Level::GRASS)
-            platformsVelocity += 0.5f;
+            platformsVelocity += 0.6f;
         level = Level::GROUND;
     }
     else if (score > 100 && score < 150)
     {
         patternNumber = 3;
         if (level == Level::GROUND)
-            platformsVelocity += 0.5f;
+            platformsVelocity += 0.6f;
         level = Level::STONE;
     }
     else if (score > 150 && score < 200)
     {
         patternNumber = 4;
         if (level == Level::STONE)
-            platformsVelocity += 0.5f;
+            platformsVelocity += 0.6f;
         level = Level::SNOW;
     }
     else if (score > 200)
     {
         patternNumber = 5;
         if (level == Level::SNOW)
-            platformsVelocity += 0.5f;
+            platformsVelocity += 0.6f;
         level = Level::ICE;;
     }
     if (score > 2)
@@ -342,7 +349,7 @@ void Game::updateFeatures() {
     }
 }
 void Game::updateBg() {;
-}   //TODO
+}               //TODO
 void Game::checkDeath() {
     auto playerBounds = player->getGlobalBounds();
     if (playerBounds.top + playerBounds.height > window->getSize().y)
@@ -389,6 +396,8 @@ void Game::platformRNG() {
     }
 
 }
+
+
 
 
 

@@ -195,6 +195,10 @@ void Player::Jump() {
         jumpcount++;
         isOnPlatform = false;
         velocity.y = kJumpAccel;
+        sbuffer.loadFromFile("jump.ogg");
+        sound.setBuffer(sbuffer);
+        sound.setVolume(2.f);
+        sound.play();
     }
 }
 //==================================================

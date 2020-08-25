@@ -52,7 +52,8 @@ private:
     sf::Event sfEvent;                      // Event object that we overwrite each time
     sf::Clock dtClock;                      // Delta time clock
     sf::Clock starClock;                    // Star feature appearance clock
-    sf::Clock ghostClock;
+    sf::Clock ghostClock;                   // Ghost feature appearance clock
+    sf::Music music;                         // Music object for background music
     bool started;                           // Flag determining whether the game has begun
     int score;                              // Player's current score
     int patternNumber;                      // Pattern number for different platforms
@@ -60,8 +61,6 @@ private:
     float startime;                         // Current star feature time
     float ghosttime;                        // Current ghost feature time
     float platformsVelocity;                // Global velocity for all platforms
-    //sf::SoundBuffer sbuffer;              // Sound buffer for game window
-    //sf::Sound sound;                      // Sound for game window
     std::vector<Platform*>* Platforms;      // Vector to contain platforms on the screen
     std::vector<Feature*>* Features;        // Vector to contain features on the screen
 
@@ -78,6 +77,7 @@ private:
     void renderFeatures();          // Renders all of the features on the screen
     void renderScore();             // Renders the player's score
     void initScore();               // Initializes the palyer's score
+    void initMusic();
     void renderPlatforms();         // Responsible for rendering platform objects
     void render();                  // Renders the game as whole - !GENERAL METHOD
     void checkDeath();              // Checks if player is dead

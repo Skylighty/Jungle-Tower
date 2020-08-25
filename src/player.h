@@ -45,6 +45,8 @@ private:
     sf::Texture textureSheet;   // Texture pattern for the player object
     sf::Sprite sprite;          // Sprite object for the player
     sf::IntRect frame;          // Currently displayed texture frame
+    sf::SoundBuffer sbuffer;              // Sound buffer for game window
+    sf::Sound sound;                      // Sound for game window
     sf::Clock animationTimer;   // Animation timer to prevent it from executing too fast
     State state;                // Enum variable indicating in which state player's character currently is
     sf::Vector2f position;      // Players position
