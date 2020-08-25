@@ -15,9 +15,11 @@ Game::Game() {
     level = Level::GRASS;
     platformsVelocity = 3.0f;
     dt = 0;
+    startime = 0;
     patternNumber = 1;
     score = 0;
     Platforms = new std::vector<Platform*>;
+    Features = new std::vector<Feature*>;
     initWindow();
     initBg();
     generateGround();
@@ -47,6 +49,8 @@ void Game::update() {
     {
         if (sfEvent.type == sf::Event::Closed || (sfEvent.type == sf::Event::KeyPressed && sfEvent.key.code == sf::Keyboard::Escape))
             window->close();
+            //TODO PAUSE MENU!
+
         if ((sfEvent.type == sf::Event::KeyPressed) && (sfEvent.key.code == sf::Keyboard::Space))
         {
             player->Jump();
@@ -59,17 +63,17 @@ void Game::update() {
     updatePlatforms();
     updateScore();
     updateBg();
+    updateFeatures();
 }                                                                  //|
 void Game::render(){
     window->clear();
-    //Platforms->clear();
 
     //Render the whole game
     renderBg();
     renderPlatforms();
     renderPlayer();
     renderScore();
-    //renderPlatforms();
+    renderFeatures();
 
     window->display();
 }                                                                   //|
@@ -79,7 +83,13 @@ void Game::render(){
 
 // ----------------------------------------- INITS -------------------------------------------
 void Game::initWindow() {
-    window = new sf::RenderWindow(sf::VideoMode(win_width, win_height), "Jungle Tower", sf::Style::Titlebar | sf::Style::Close);
+    window = new sf::RenderWindow(
+            sf::VideoMode(win_width, win_height),
+            "Jungle Tower",
+            sf::Style::Titlebar | sf::Style::Close);
+    sf::Image icon;
+    icon.loadFromFile("vine-leaf.png");
+    window->setIcon(256, 256, icon.getPixelsPtr());
     window->setFramerateLimit(60);
 }
 void Game::initBg() {
@@ -93,9 +103,9 @@ void Game::initPlayer() {
 }
 void Game::initScore() {
     if(!font.loadFromFile("ka1.ttf"))
-        std::cout << "Font load successful\n";
-    else
         std::cout << "ERROR: FONT LOADING ERROR!\n";
+    else
+        std::cout << "Font loaded successfully\n";
     Score.setFont(font);
     Score.setCharacterSize(50);
     Score.setFillColor(sf::Color::White);
@@ -122,6 +132,14 @@ void Game::renderBg() {
 void Game::renderScore() {
     window->draw(Score);
 }
+void Game::renderFeatures(){
+    if (!Features->empty()){
+        for (auto &Feature : *Features)
+        {
+            Feature->render(window);
+        }
+    }
+}
 
 
 // --------------------------------------- UPDATES --------------------------------------------
@@ -131,21 +149,22 @@ void Game::updatePlayer() {
 }
 void Game::updateCollision() {
 
-    if (player->getGlobalBounds().left < 0)
-    {
+    // Left side of the screen collision
+    if (player->getGlobalBounds().left < 0) {
         player->setVelocity(0.f, player->getVelocity().y);
         player->setPlayerPosition(0, player->getGlobalBounds().top);
         player->setVelocity(10.f, player->getVelocity().y);
     }
 
-    if (player->getGlobalBounds().left + player->getGlobalBounds().width > window->getSize().x)
-    {
+    // Right side of the screen collision
+    if (player->getGlobalBounds().left + player->getGlobalBounds().width > window->getSize().x) {
         player->setVelocity(0.f, player->getVelocity().y);
         player->setPlayerPosition(window->getSize().x - player->getGlobalBounds().width, player->getGlobalBounds().top);
         player->setVelocity(-10.f, player->getVelocity().y);
     }
-    if (!Platforms->empty()) {
 
+    // Platforms collision
+    if (!Platforms->empty()) {
 
         // Collision algorithim for all of the platforms!!! Working Well!!!!!!!
         for (auto &Platform : *Platforms) {
@@ -154,19 +173,50 @@ void Game::updateCollision() {
 
             // ((playerBounds.left ))
 
-            if ((playerBounds.top+playerBounds.height >= platformBounds.top) &&
-                (playerBounds.top+playerBounds.height <= platformBounds.top+(0.5*platformBounds.height)) &&
+            if ((playerBounds.top + playerBounds.height >= platformBounds.top) &&
+                (playerBounds.top + playerBounds.height <= platformBounds.top + (0.5 * platformBounds.height)) &&
                 (playerBounds.left + playerBounds.width >= platformBounds.left) &&
-                (playerBounds.left <= platformBounds.left+platformBounds.width))
-            {
+                (playerBounds.left <= platformBounds.left + platformBounds.width)) {
                 player->resetJump();
                 player->setIsOnPlatform(true);
                 player->setVelocity(player->getVelocity().x, 0.f);
-                player->setPlayerPosition(playerBounds.left, platformBounds.top - playerBounds.height+10);
+                player->setPlayerPosition(playerBounds.left, platformBounds.top - playerBounds.height + 10);
 
-            }
-            else
+            } else
                 player->setIsOnPlatform(false);
+        }
+    }
+
+    // Features collision
+    if (!Features->empty())
+    {
+        for (int i = 0; i < Features->size(); ++i)
+        {
+            if (player->getGlobalBounds().intersects(Features->at(i)->getGlobalBounds()))
+            {
+                if (Features->at(i)->type == Feature::Type::STAR)
+                {
+                    score += 5;
+                    Feature *temp = Features->at(i);
+                    Features->erase(Features->begin()+(i));
+                    delete temp;
+                    temp = nullptr;
+                }
+            }
+        }
+        // Fixed - another for is needed becuase if it is in the same for as STAR checks
+        // the if checks the memory that is alredy dump-deleted
+        for (int i = 0; i < Features->size(); ++i)
+        {
+            if (player->getGlobalBounds().intersects((Features->at(i)->getGlobalBounds())) &&
+                Features->at(i)->type == Feature::Type::GHOST)
+            {
+                player->dead = true;
+//                Feature *temp = Features->at(i);
+//                Features->erase(Features->begin()+(i));
+//                delete temp;
+//                temp = nullptr;
+            }
         }
     }
 }
@@ -200,7 +250,8 @@ void Game::updatePlatforms() {
 }
 void Game::updateDT() {
     dt = dtClock.getElapsedTime().asSeconds();
-    std::cout << std::to_string(dt) + "\n";
+    startime = starClock.getElapsedTime().asSeconds();
+    ghosttime = ghostClock.getElapsedTime().asSeconds();
 }
 void Game::updateScore() {
     Score.setString("0"+std::to_string(score));
@@ -208,34 +259,86 @@ void Game::updateScore() {
     {
         patternNumber = 2;
         if (level == Level::GRASS)
-            platformsVelocity += 0.4f;
+            platformsVelocity += 0.5f;
         level = Level::GROUND;
     }
     else if (score > 100 && score < 150)
     {
         patternNumber = 3;
         if (level == Level::GROUND)
-            platformsVelocity += 0.4f;
+            platformsVelocity += 0.5f;
         level = Level::STONE;
     }
     else if (score > 150 && score < 200)
     {
         patternNumber = 4;
         if (level == Level::STONE)
-            platformsVelocity += 0.4f;
+            platformsVelocity += 0.5f;
         level = Level::SNOW;
     }
     else if (score > 200)
     {
         patternNumber = 5;
         if (level == Level::SNOW)
-            platformsVelocity += 0.4f;
+            platformsVelocity += 0.5f;
         level = Level::ICE;;
     }
     if (score > 2)
     {
         started = true;
         ground->setVelocity(2.f);
+    }
+}
+void Game::updateFeatures() {
+    // Creating the star features
+    if (startime > 5.f)
+    {
+        starClock.restart();
+        Feature *star_new = new Feature(Feature::Type::STAR, ((rand() % 950) + 250), ((rand() % 400) + 100));
+        Features->push_back(star_new);
+    }
+
+    // Creating the ghost features
+    if (ghosttime > 12.f)
+    {
+        ghostClock.restart();
+        Feature *ghost_new = new Feature(Feature::Type::GHOST, ((rand() % 950) + 250), ((rand() % 400) + 100));
+        Features->push_back(ghost_new);
+    }
+
+    // Animating the features
+    if (!Features->empty())
+    {
+        for (auto &Feature : *Features)
+        {
+            Feature->updateAnimation();
+        }
+        if (startime > 2.5f && startime < 2.6f)
+        {
+            for (int i = 0; i < Features->size(); ++i)
+            {
+                if (Features->at(i)->type == Feature::Type::STAR)
+                {
+                    Feature *temp = Features->at(i);
+                    Features->erase(Features->begin()+(i));
+                    delete temp;
+                    temp = nullptr;
+                }
+            }
+        }
+        if (ghosttime > 4.0f && ghosttime < 4.1f)
+        {
+            for (int i = 0; i < Features->size(); ++i)
+            {
+                if (Features->at(i)->type == Feature::Type::GHOST)
+                {
+                    Feature *temp = Features->at(i);
+                    Features->erase(Features->begin()+(i));
+                    delete temp;
+                    temp = nullptr;
+                }
+            }
+        }
     }
 }
 void Game::updateBg() {;
@@ -286,6 +389,10 @@ void Game::platformRNG() {
     }
 
 }
+
+
+
+
 
 
 
