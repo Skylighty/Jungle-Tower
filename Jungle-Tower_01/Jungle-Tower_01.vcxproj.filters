@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\feature.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\platform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\feature.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\res\background.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\death_bg.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\ghost-idle.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\ghost-sheet.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\grass-platform.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\ground.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\ground-platform.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\ice-platform.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\menu.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\PlayerTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\snow-platform.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\star-coin.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\start_menu.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\stone-platform.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\res\vine-leaf.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\res\jump.ogg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Jungle-Tower_01.sln">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\music.ogg">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\res\ka1.ttf">
+      <Filter>Resource Files</Filter>
+    </Font>
+  </ItemGroup>
+</Project>
