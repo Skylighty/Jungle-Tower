@@ -26,6 +26,7 @@ public:
     void initAnimation();
     void render(sf::RenderTarget *target);
     void updateAnimation();
+    void setSpriteColor(sf::Color color);
     sf::FloatRect getGlobalBounds();
 
 private:

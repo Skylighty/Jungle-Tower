@@ -197,9 +197,13 @@ void Player::Jump() {
         velocity.y = kJumpAccel;
         sbuffer.loadFromFile("jump.ogg");
         sound.setBuffer(sbuffer);
-        sound.setVolume(2.f);
+        sound.setVolume(20.f);
         sound.play();
     }
+}
+
+void Player::changeSpriteColor(sf::Color color) {
+    sprite.setColor(color);
 }
 //==================================================
 

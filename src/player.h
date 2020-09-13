@@ -26,6 +26,7 @@ public:
 
     //------------------------------------- METHODS -----------------------------------------
     void update();                                  // Updates the player position,state etc.
+    void changeSpriteColor(sf::Color color);        // Multiplies the sprite color
     void updatePhysics();                           // Updates the physics of a player character
     void updateMovement();                          // Reaction for key-pressing movement of player object
     void updateAnimations();                        // Updates the animation of player while in movement
@@ -69,7 +70,7 @@ private:
     void initTexture();                                 // Initializes the texture from file for player object
     void initSprite();                                  // Initializes the sprite from textures for player object
     void initAnimations();                              // Initializes the animations
-    static bool IsAnyKeyPressed();                             // Returns if any key is pressed
+    static bool IsAnyKeyPressed();                       // Returns if any key is pressed
 };
 
 

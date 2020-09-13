@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(platformowka_again)
+project(Jungle-Tower)
 
 set(SFML_DIR "C:/SFML")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/" ${CMAKE_MODULE_PATH})

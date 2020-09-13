@@ -85,3 +85,7 @@ void Feature::render(sf::RenderTarget *target) {
 sf::FloatRect Feature::getGlobalBounds() {
     return sprite.getGlobalBounds();
 }
+
+void Feature::setSpriteColor(sf::Color color) {
+    sprite.setColor(color);
+}
